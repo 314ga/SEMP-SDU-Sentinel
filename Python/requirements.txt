@@ -1,0 +1,13 @@
+proj
+pyproj
+wheel
+pipwin
+numpy
+pandas
+shapely
+fiona
+six
+rtree
+geopandas
+rasterio
+matplotlib
