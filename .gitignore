@@ -1,1 +1,3 @@
-/Data
+/python/data
+/hadoop/data
+**/*.tiff

@@ -2,7 +2,7 @@ version: '3'
 
 services:
   image-processing:
-    build: ./Python
+    build: ./python
     volumes:
       - ./python:/usr/src/app
     ports:

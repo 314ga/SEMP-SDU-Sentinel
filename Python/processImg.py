@@ -2,9 +2,15 @@
 import rasterio
 from rasterio import plot
 import matplotlib.pyplot as plt
-
+from datetime import datetime
+import numpy as np
+# current date and time
+now = datetime.now()
+timestamp = datetime.timestamp(now)
+print(datetime.fromtimestamp(timestamp))
+print("workingstart")
 # import bands as separate 1 band raster
-imagePath = './Data/S2A_MSIL2A_20180803T103021_N0208_R108_T32UNG_20180803T151712SAFE/GRANULE/IMG_DATA/R10m/'
+imagePath = './data/S2A_MSIL2A_20180803T103021_N0208_R108_T32UNG_20180803T151712SAFE/GRANULE/L2A_T32UNG_A016264_20180803T103239/IMG_DATA/R10m/'
 band2 = rasterio.open(
     imagePath+'T32UNG_20180803T103021_B02_10m.jp2', driver='JP2OpenJPEG')  # blue
 band3 = rasterio.open(
@@ -14,54 +20,31 @@ band4 = rasterio.open(
 band8 = rasterio.open(
     imagePath+'T32UNG_20180803T103021_B08_10m.jp2', driver='JP2OpenJPEG')  # nir
 # number of raster bands
-band4.count
+print(band4.count)
 # number of raster columns
-band4.width
+print(band4.width)
 # number of raster rows
-band4.height
+print(band4.height)
+print(band4.bounds)
 # plot band
-plot.show(band4)
-# type of raster byte
-band4.dtypes[0]
-# raster sytem of reference
-band4.crs
-# raster transform parameters
-band4.transform
-# raster values as matrix array
-band4.read(1)
-# multiple band representation
-fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(12, 4))
-plot.show(band2, ax=ax1, cmap='Blues')
-plot.show(band3, ax=ax2, cmap='Greens')
-plot.show(band4, ax=ax3, cmap='Reds')
-fig.tight_layout()
-# export true color image
-trueColor = rasterio.open('../Output/SentinelTrueColor2.tiff', 'w', driver='Gtiff',
-                          width=band4.width, height=band4.height,
-                          count=3,
-                          crs=band4.crs,
-                          transform=band4.transform,
-                          dtype=band4.dtypes[0]
-                          )
-trueColor.write(band2.read(1), 3)  # blue
-trueColor.write(band3.read(1), 2)  # green
-trueColor.write(band4.read(1), 1)  # red
-trueColor.close()
-src = rasterio.open(r"../Output/SentinelTrueColor2.tiff", count=3)
-plot.show(src)
-# export false color image
-falseColor = rasterio.open('../Output/SentinelFalseColor.tiff', 'w', driver='Gtiff',
-                           width=band2.width, height=band2.height,
-                           count=3,
-                           crs=band2.crs,
-                           transform=band2.transform,
-                           dtype='uint16'
-                           )
-falseColor.write(band3.read(1), 3)  # Blue
-falseColor.write(band4.read(1), 2)  # Green
-falseColor.write(band8.read(1), 1)  # Red
-falseColor.close()
-# generate histogram
-trueColor = rasterio.open('../Output/SentinelTrueColor2.tiff')
-plot.show_hist(trueColor, bins=50, lw=0.0, stacked=False,
-               alpha=0.3, histtype='stepfilled', title="Histogram")
+bandNir = band8.read(1)
+bandRed = band4.read(1)
+print(bandRed.shape)
+ndvi = np.zeros(bandRed.shape, dtype=rasterio.float32)
+ndvi = (bandNir.astype(float)-bandRed.astype(float))/(bandNir+bandRed)
+for x in ndvi:
+    print(x)
+
+profile = band4.profile
+profile.update(
+    dtype=rasterio.float32,
+    count=1,
+    compress='lzw',
+    driver='GTiff')
+
+with rasterio.open('./exampleNDVI2.tiff', 'w', **profile) as dst:
+    dst.write_band(1, ndvi.astype(rasterio.float32))
+
+now = datetime.now()
+timestamp = datetime.timestamp(now)
+print(datetime.fromtimestamp(timestamp))
