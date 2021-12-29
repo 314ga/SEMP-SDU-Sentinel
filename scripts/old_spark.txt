@@ -1,0 +1,42 @@
+su -
+apk add --no-cache gcc g++ python python-dev py-pip mysql-dev linux-headers libffi-dev openssl-dev
+
+vi /etc/apk/repositories
+http://dl-cdn.alpinelinux.org/alpine/edge/main/
+http://dl-cdn.alpinelinux.org/alpine/edge/community/
+
+apk update
+apk upgrade --available && sync
+apk add gdal-dev
+
+export CPLUS_INCLUDE_PATH=/usr/include/gdal
+export C_INCLUDE_PATH=/usr/include/gdal
+python3 -m pip install --upgrade pip
+pip install --upgrade setuptools
+
+apk add dpkg
+update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+update-alternatives --config python
+apk add proj-dev
+apk add proj-util
+apk add py3-pandas
+apk add py3-wheel
+export PROJ_DIR=/usr
+apk del python-dev
+apk del python py-pip
+apk del python
+apk del python2
+apk add python3-dev
+apk add py3-pip
+pip install --upgrade pip
+pip3 install gdal
+export SPARK_HOME="/spark"
+
+pip3 install pyrasterframes==0.8.5
+
+update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+update-alternatives --config python
+
+pyspark --master local[*] --py-files pyrasterframes_2.11-0.9.0-python.zip --packages org.locationtech.rasterframes:rasterframes_2.11:0.9.0,org.locationtech.rasterframes:pyrasterframes_2.11:0.9.0,org.locationtech.rasterframes:rasterframes-datasource_2.11:0.9.0 --conf spark.serializer=org.apache.spark.serializer.KryoSerializer --conf spark.kryo.registrator=org.locationtech.rasterframes.util.RFKryoRegistrator --conf spark.kryoserializer.buffer.max=500m

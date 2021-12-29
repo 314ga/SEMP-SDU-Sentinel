@@ -1,3 +1,5 @@
 /python/data
 /hadoop/data
 **/*.tiff
+*.jp2
+SparkCluster/SparkRasterImage/jdk-8u311-linux-x64.tar.gz

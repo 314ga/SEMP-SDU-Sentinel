@@ -1,0 +1,14 @@
+apt-get install python3.7-dev
+add-apt-repository ppa:ubuntugis/ppa && apt-get update
+apt-get install gdal-bin
+apt-get install libgdal-dev
+export CPLUS_INCLUDE_PATH=/usr/include/gdal
+export C_INCLUDE_PATH=/usr/include/gdal
+pip3 install GDAL==2.4.4
+pip3 install proj
+pip3 install setuptools==57.5.0
+pip3 install --upgrade pip
+apt-get install -y python3-pyproj
+apt-get install python-wheel
+apt-get install libgdal-doc
+python3 -m pip install pyrasterframes==0.9.0

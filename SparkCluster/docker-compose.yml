@@ -1,0 +1,139 @@
+version: "3.3"
+services:
+  namenode: #Master (metadata/chunk)
+    image: bde2020/hadoop-namenode:1.2.0-hadoop2.7.4-java8
+    container_name: namenode
+    restart: always
+    ports:
+      - 9870:9870
+      - 9000:9000
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.2
+
+  datanode1: #Slave1
+    image: bde2020/hadoop-datanode:1.2.0-hadoop2.7.4-java8
+    container_name: datanode1
+    restart: always
+    ports:
+      - 9864:9864
+    volumes:
+      - hadoop_datanode1:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.3
+
+  datanode2: #Slave2
+    image: bde2020/hadoop-datanode:1.2.0-hadoop2.7.4-java8
+    container_name: datanode2
+    restart: always
+    ports:
+      - 9865:9864
+    volumes:
+      - hadoop_datanode2:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.4
+
+  datanode3: #Slave3
+    image: bde2020/hadoop-datanode:1.2.0-hadoop2.7.4-java8
+    container_name: datanode3
+    restart: always
+    ports:
+      - 9866:9864
+    volumes:
+      - hadoop_datanode3:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.5
+  spark-master:
+    image: cluster-apache-spark:2.4.3
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+    volumes:
+       - ./apps:/opt/spark-apps
+       - ./data:/opt/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.9
+  spark-worker-one:
+    image: cluster-apache-spark:2.4.3
+    ports:
+      - "9091:8080"
+      - "7000:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-one
+    volumes:
+       - ./apps:/opt/spark-apps
+       - ./data:/opt/spark-data
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.10
+  spark-worker-two:
+    image: cluster-apache-spark:2.4.3
+    ports:
+      - "9092:8080"
+      - "7001:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-two
+    volumes:
+        - ./apps:/opt/spark-apps
+        - ./data:/opt/spark-data
+    networks:
+      cscourse:
+        ipv4_address: 172.200.0.11
+   
+networks:
+  cscourse:
+    name: hadoop
+    ipam:
+      config:
+        - subnet: 172.200.0.0/24
+
+volumes:
+  hadoop_namenode:
+    name: namenode
+  hadoop_datanode1:
+    name: datanode1
+  hadoop_datanode2:
+    name: datanode2
+  hadoop_datanode3:
+    name: datanode3

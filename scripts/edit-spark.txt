@@ -1,0 +1,33 @@
+su -
+apk add --no-cache gcc g++ python python-dev py-pip mysql-dev linux-headers libffi-dev openssl-dev
+
+vi /etc/apk/repositories
+http://dl-cdn.alpinelinux.org/alpine/edge/main/
+http://dl-cdn.alpinelinux.org/alpine/edge/community/
+
+apk update
+apk upgrade --available && sync
+apk add gdal-dev
+
+export CPLUS_INCLUDE_PATH=/usr/include/gdal
+export C_INCLUDE_PATH=/usr/include/gdal
+python3 -m pip install --upgrade pip
+pip install --upgrade setuptools
+
+apk add dpkg
+update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+update-alternatives --config python
+
+apk del python-dev
+apk del python py-pip
+apk del python
+apk del python2
+apk add python3-dev
+apk add py3-pip
+pip install --upgrade pip
+pip3 install gdal
+export PROJ_DIR=/usr
+apk add proj-dev
+apk add proj-util
+python3 -m pip install pyrasterframes

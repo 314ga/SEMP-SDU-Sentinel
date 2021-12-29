@@ -1,0 +1,10 @@
+PROCESS NDVI:
+
+red_uri ='https://rasterframes.s3.amazonaws.com/samples/luray_snp/B04.tif'
+nir_uri = 'https://rasterframes.s3.amazonaws.com/samples/luray_snp/B08.tif'
+catalog_df = spark.createDataFrame([Row(red=red_uri, nir=nir_uri)])
+df = spark.read.raster(catalog_df,catalog_col_names=['red', 'nir'])
+df.printSchema()
+df = df.withColumn('ndvi', rf_normalized_difference(df.nir, df.red))
+
+df.select('ndvi').write.geotiff('geotiff-overview.tif', crs='EPSG:4326')

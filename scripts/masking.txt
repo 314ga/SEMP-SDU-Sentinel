@@ -1,0 +1,18 @@
+import pyrasterframes
+spark = spark.withRasterFrames()
+df = spark.read.raster('file:///dataDK/T32UNG_20180803T103021_B04_10m.jp2')
+print(df.head())
+
+
+import pyrasterframes
+spark = spark.withRasterFrames()
+from pyrasterframes.utils import create_rf_spark_session
+from pyrasterframes.rasterfunctions import *
+from pyspark.sql import Row
+
+blue_uri = 'https://rasterframes.s3.amazonaws.com/samples/luray_snp/B02.tif'
+green_uri = 'https://rasterframes.s3.amazonaws.com/samples/luray_snp/B03.tif'
+scl_uri = 'https://rasterframes.s3.amazonaws.com/samples/luray_snp/SCL.tif'
+cat = spark.createDataFrame([Row(blue=blue_uri, green=green_uri, scl=scl_uri),])
+unmasked = spark.read.raster(cat, catalog_col_names=['blue', 'green', 'scl'])
+unmasked.printSchema()

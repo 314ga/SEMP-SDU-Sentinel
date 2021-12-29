@@ -1,0 +1,26 @@
+wget http://mirrors.ocf.berkeley.edu/apache/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+tar -xvf apache-hive-3.1.2-bin.tar.gz -C /opt/
+rm apache-hive-3.1.2-bin.tar.gz && cd /opt
+
+echo "export HIVE_HOME=/opt/apache-hive-3.1.2-bin" >> ~/.bashrc
+echo "export PATH=\$PATH:\$HIVE_HOME/bin" >> ~/.bashrc
+. ~/.bashrc
+
+echo "export HADOOP_HOME=/opt/hadoop-2.7.4" >> /opt/apache-hive-3.1.2-bin/bin/hive-config.sh
+tar -xvf jdk-8u311-linux-x64.tar.gz -C /usr/local
+rm jdk-8u311-linux-x64.tar.gz && cd /usr/local
+export JAVA_HOME=/usr/local/jdk1.8.0_311
+
+dfs dfs -mkdir /tmp
+hdfs dfs -mkdir /user
+hdfs dfs -mkdir /user/hive
+hdfs dfs -mkdir /user/hive/warehouse
+hdfs dfs -chmod g+w /user/hive/warehouse
+hdfs dfs -chmod g+w /tmp
+
+cd /opt/apache-hive-3.1.2-bin/conf
+mv hive-default.xml.template hive.default.xml
+
+export JAVA_HOME=/usr/local/jdk1.8.0_311
+/opt/apache-hive-3.1.2-bin/bin/hive
+. ~/.bashrc
