@@ -1,0 +1,2 @@
+docker-compose up
+open localhost:5000
